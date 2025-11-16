@@ -83,7 +83,7 @@ window.addEventListener("load", () => {
   });
 });
 
-/* تفعيل الكود مرة واحدة فقط */
+/* كود التفعيل المعدل: يسمح باستخدام الكود أكثر من مرة لكل جهاز */
 document.getElementById("activateBtn").addEventListener("click", () => {
   const code = document.getElementById("userCode").value.trim();
   const msg = document.getElementById("activationMsg");
@@ -94,18 +94,12 @@ document.getElementById("activateBtn").addEventListener("click", () => {
     return;
   }
 
-  if (localStorage.getItem("used_" + code)) {
-    msg.textContent = "⚠️ هذا الكود مستخدم مسبقًا على هذا الجهاز.";
-    msg.style.color = "red";
-    return;
-  }
-
+  // إزالة شرط منع إعادة التفعيل على نفس الجهاز!
   const found = codesData.find(c => c.code.toLowerCase() === code.toLowerCase());
 
   if (found) {
     const userId = "ID-" + Math.floor(Math.random() * 1000000);
     const date = new Date().toLocaleString("ar-SA");
-    localStorage.setItem("used_" + code, JSON.stringify({userId, date}));
     msg.textContent = "✅ تم تفعيل الكود بنجاح!";
     msg.style.color = "green";
     setTimeout(() => {
