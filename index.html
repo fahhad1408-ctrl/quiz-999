@@ -56,10 +56,34 @@
     }
     #activateBtn, #nextBtn { background: linear-gradient(90deg,#d4af37,#f0d47a); color:#111; }
     #storeBtn { background: linear-gradient(90deg,#6b21a8,#a78bfa); color:#fff; }
-    #choices button { background: linear-gradient(90deg,#1e3a8a,#3b82f6); color:#fff; width:90%; }
-    button:hover {
+    #choices {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom:15px;
+    }
+    #choices button {
+      background: linear-gradient(90deg,#1e3a8a,#3b82f6);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      min-width: 100px;
+      font-weight:600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    #choices button:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 25px rgba(255,255,255,0.3), 0 0 50px rgba(255,255,255,0.15);
+      box-shadow: 0 0 20px rgba(255,255,255,0.3), 0 0 40px rgba(255,255,255,0.15);
+    }
+    #questionNumber {
+      font-size:18px;
+      font-weight:600;
+      margin-bottom:10px;
+      color:#ffd700;
     }
   </style>
 </head>
@@ -77,6 +101,7 @@
 
 <!-- شاشة الاختبار -->
 <div id="quizScreen" class="screen hidden">
+  <p id="questionNumber"></p>
   <img id="questionImage" src="" alt="السؤال">
   <div id="choices"></div>
   <p id="feedback"></p>
@@ -149,16 +174,17 @@ function startQuiz() { currentQuestion=0; score=0; weakSections=[]; showQuestion
 
 function showQuestion() {
   const q = questions[currentQuestion];
-  document.getElementById("questionImage").src=q.image;
-  const cDiv=document.getElementById("choices");
-  cDiv.innerHTML="";
-  q.choices.forEach(ch=>{
-    const btn=document.createElement("button");
-    btn.textContent=ch.trim();
-    btn.onclick=()=>checkAnswer(ch.trim());
+  document.getElementById("questionNumber").textContent = `السؤال ${currentQuestion + 1} من ${questions.length}`;
+  document.getElementById("questionImage").src = q.image;
+  const cDiv = document.getElementById("choices");
+  cDiv.innerHTML = "";
+  q.choices.forEach(ch => {
+    const btn = document.createElement("button");
+    btn.textContent = ch.trim();
+    btn.onclick = () => checkAnswer(ch.trim());
     cDiv.appendChild(btn);
   });
-  document.getElementById("feedback").textContent="";
+  document.getElementById("feedback").textContent = "";
   document.getElementById("nextBtn").classList.add("hidden");
 }
 
