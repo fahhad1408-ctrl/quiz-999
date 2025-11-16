@@ -23,6 +23,7 @@
   <input type="text" id="userCode" placeholder="أدخل الكود هنا">
   <button id="activateBtn">تفعيل الكود</button>
   <p id="activationMsg"></p>
+  <button id="storeBtn">احصل على الكود من المتجر</button>
 </div>
 
 <!-- شاشة الاختبار -->
@@ -111,6 +112,11 @@ document.getElementById("activateBtn").addEventListener("click", () => {
     msg.textContent = "❌ الكود غير صحيح. حاول بكود آخر.";
     msg.style.color = "red";
   }
+});
+
+/* زر المتجر: يفتح رابط المتجر */
+document.getElementById("storeBtn").addEventListener("click", function() {
+  window.open("https://www.madty.net/fd1/", "_blank"); // ضع هنا رابط متجرك الحقيقي!
 });
 
 /* منطق الاختبار */
