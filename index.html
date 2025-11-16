@@ -4,14 +4,63 @@
   <meta charset="UTF-8">
   <title>نظام الاختبارات</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Tahoma; background:#f2f2f2; text-align:center; margin:0; padding:20px;}
-    .hidden {display:none;}
-    .screen {max-width:600px; margin:auto; background:white; padding:20px; border-radius:10px; box-shadow:0 0 10px #ccc;}
-    button {padding:10px 20px; margin:10px; cursor:pointer; background:#007bff; color:white; border:none; border-radius:5px;}
-    button:hover {background:#0056b3;}
-    input[type="text"] {padding:8px; width:90%; margin:10px 0;}
-    img {max-width:100%; border:1px solid #ddd; margin:10px 0;}
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg,#0a0a0a,#1f1f1f);
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      color: #f5f5f5;
+    }
+    .hidden { display:none; }
+    .screen {
+      max-width: 600px;
+      margin: auto;
+      background: rgba(30,30,30,0.85);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    h2 { font-size:26px; margin-bottom:10px; }
+    p { font-size:16px; margin-bottom:20px; }
+    input[type="text"] {
+      padding:12px;
+      width:90%;
+      margin:10px 0;
+      border-radius:12px;
+      border:1px solid #555;
+      background: rgba(255,255,255,0.05);
+      color:#f5f5f5;
+    }
+    input::placeholder { color:#ccc; }
+    img {
+      max-width:100%;
+      border-radius:12px;
+      margin:15px 0;
+      border:1px solid #444;
+    }
+    button {
+      padding:14px 24px;
+      margin:10px 5px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:16px;
+      border-radius:12px;
+      border:none;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    }
+    #activateBtn, #nextBtn { background: linear-gradient(90deg,#d4af37,#f0d47a); color:#111; }
+    #storeBtn { background: linear-gradient(90deg,#6b21a8,#a78bfa); color:#fff; }
+    #choices button { background: linear-gradient(90deg,#1e3a8a,#3b82f6); color:#fff; width:90%; }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(255,255,255,0.3), 0 0 50px rgba(255,255,255,0.15);
+    }
   </style>
 </head>
 <body>
@@ -43,10 +92,9 @@
 </div>
 
 <script>
-// رابط التحميل المباشر للملفات من الريبو
 const repoRawUrl = "https://raw.githubusercontent.com/fahhad1408-ctrl/quiz-999/main/";
-const codesFile = "قالب_الأكواد.XLSX";     // اسم ملف الأكواد كما في الريبو
-const questionsFile = "questions.xlsx";    // اسم ملف الأسئلة كما في الريبو
+const codesFile = "قالب_الأكواد.XLSX";
+const questionsFile = "questions.xlsx";
 
 let codesData = [];
 let questions = [];
@@ -54,7 +102,6 @@ let currentQuestion = 0;
 let score = 0;
 let weakSections = [];
 
-/* قراءة ملفات Excel من الريبو */
 function fetchExcelAndRead(fileName, callback) {
   fetch(repoRawUrl + fileName)
     .then(res => res.arrayBuffer())
@@ -63,12 +110,9 @@ function fetchExcelAndRead(fileName, callback) {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const json = XLSX.utils.sheet_to_json(sheet, {header:1});
       callback(json);
-    }).catch(e => {
-      alert("تعذر تحميل الملف: " + fileName);
-      console.error(e);
-    });
+    }).catch(e => { alert("تعذر تحميل الملف: " + fileName); console.error(e); });
 }
-// تحميل الأكواد والأسئلة تلقائيًا
+
 window.addEventListener("load", () => {
   fetchExcelAndRead(codesFile, data => {
     codesData = data.slice(1).map(r => ({code: (r[0]||"").toString().trim()}));
@@ -84,102 +128,66 @@ window.addEventListener("load", () => {
   });
 });
 
-/* كود التفعيل المعدل: يسمح باستخدام الكود أكثر من مرة لكل جهاز */
 document.getElementById("activateBtn").addEventListener("click", () => {
   const code = document.getElementById("userCode").value.trim();
   const msg = document.getElementById("activationMsg");
-
-  if (!code) {
-    msg.textContent = "يرجى إدخال الكود.";
-    msg.style.color = "red";
-    return;
-  }
-
-  // إزالة شرط منع إعادة التفعيل على نفس الجهاز!
+  if (!code) { msg.textContent="يرجى إدخال الكود."; msg.style.color="red"; return; }
   const found = codesData.find(c => c.code.toLowerCase() === code.toLowerCase());
-
   if (found) {
-    const userId = "ID-" + Math.floor(Math.random() * 1000000);
-    const date = new Date().toLocaleString("ar-SA");
-    msg.textContent = "✅ تم تفعيل الكود بنجاح!";
-    msg.style.color = "green";
-    setTimeout(() => {
+    msg.textContent="✅ تم تفعيل الكود بنجاح!"; msg.style.color="green";
+    setTimeout(()=>{
       document.getElementById("startScreen").classList.add("hidden");
       document.getElementById("quizScreen").classList.remove("hidden");
       startQuiz();
-    }, 1000);
-  } else {
-    msg.textContent = "❌ الكود غير صحيح. حاول بكود آخر.";
-    msg.style.color = "red";
-  }
+    },1000);
+  } else { msg.textContent="❌ الكود غير صحيح. حاول بكود آخر."; msg.style.color="red"; }
 });
 
-/* زر المتجر: يفتح رابط المتجر */
-document.getElementById("storeBtn").addEventListener("click", function() {
-  window.open("https://www.madty.net/fd1/", "_blank"); // ضع هنا رابط متجرك الحقيقي!
-});
+document.getElementById("storeBtn").addEventListener("click",()=>window.open("https://www.madty.net/fd1/","_blank"));
 
-/* منطق الاختبار */
-function startQuiz() {
-  currentQuestion = 0;
-  score = 0;
-  weakSections = [];
-  showQuestion();
-}
+function startQuiz() { currentQuestion=0; score=0; weakSections=[]; showQuestion(); }
 
 function showQuestion() {
   const q = questions[currentQuestion];
-  document.getElementById("questionImage").src = q.image;
-  const cDiv = document.getElementById("choices");
-  cDiv.innerHTML = "";
-  q.choices.forEach(ch => {
-    const btn = document.createElement("button");
-    btn.textContent = ch.trim();
-    btn.onclick = () => checkAnswer(ch.trim());
+  document.getElementById("questionImage").src=q.image;
+  const cDiv=document.getElementById("choices");
+  cDiv.innerHTML="";
+  q.choices.forEach(ch=>{
+    const btn=document.createElement("button");
+    btn.textContent=ch.trim();
+    btn.onclick=()=>checkAnswer(ch.trim());
     cDiv.appendChild(btn);
   });
-  document.getElementById("feedback").textContent = "";
+  document.getElementById("feedback").textContent="";
   document.getElementById("nextBtn").classList.add("hidden");
 }
 
-function checkAnswer(choice) {
-  const q = questions[currentQuestion];
-  const feedback = document.getElementById("feedback");
-  const correctChoice = (q.correct||"").trim();
-
-  if (choice.startsWith(correctChoice)) {
-    score++;
-    feedback.innerHTML = "✅ إجابتك صحيحة!";
-  } else {
-    feedback.innerHTML = `❌ إجابتك خاطئة. الإجابة الصحيحة هي: ${correctChoice}`;
-    if(q.section) weakSections.push(q.section);
-  }
-
-  if (q.explain) {
-    const img = document.createElement("img");
-    img.src = q.explain;
-    feedback.appendChild(img);
-  }
-
+function checkAnswer(choice){
+  const q=questions[currentQuestion];
+  const feedback=document.getElementById("feedback");
+  const correctChoice=(q.correct||"").trim();
+  if(choice.startsWith(correctChoice)){ score++; feedback.innerHTML="✅ إجابتك صحيحة!"; }
+  else { feedback.innerHTML=`❌ إجابتك خاطئة. الإجابة الصحيحة هي: ${correctChoice}`; if(q.section) weakSections.push(q.section); }
+  if(q.explain){ const img=document.createElement("img"); img.src=q.explain; feedback.appendChild(img); }
   document.getElementById("nextBtn").classList.remove("hidden");
 }
 
-document.getElementById("nextBtn").addEventListener("click", () => {
+document.getElementById("nextBtn").addEventListener("click",()=>{
   currentQuestion++;
-  if (currentQuestion < questions.length) showQuestion();
+  if(currentQuestion<questions.length) showQuestion();
   else showResult();
 });
 
-function showResult() {
+function showResult(){
   document.getElementById("quizScreen").classList.add("hidden");
   document.getElementById("resultScreen").classList.remove("hidden");
-  const percent = Math.round((score / questions.length) * 100);
-  document.getElementById("finalScore").textContent = `نتيجتك: ${percent} من 100`;
-  const unique = [...new Set(weakSections)];
-  document.getElementById("weakPoints").textContent = unique.length ? "نقاط الضعف: " + unique.join("، ") : "ممتاز! لا توجد نقاط ضعف.";
+  const percent=Math.round((score/questions.length)*100);
+  document.getElementById("finalScore").textContent=`نتيجتك: ${percent} من 100`;
+  const unique=[...new Set(weakSections)];
+  document.getElementById("weakPoints").textContent=unique.length? "نقاط الضعف: "+unique.join("، "):"ممتاز! لا توجد نقاط ضعف.";
 }
 
-function restart() {
+function restart(){
   document.getElementById("resultScreen").classList.add("hidden");
   document.getElementById("startScreen").classList.remove("hidden");
 }
